@@ -1,0 +1,18 @@
+{
+  "name": "ctripbiz-open-data-studio",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "scripts": {
+    "dev": "concurrently -k -n api,web -c blue,green \"npm --prefix apps/api run dev\" \"npm --prefix apps/web run dev -- --port 4173 --strictPort\"",
+    "build": "npm --prefix apps/web run build",
+    "start": "npm --prefix apps/api start",
+    "test": "npm --prefix apps/web run build && npm --prefix apps/api test && npm --prefix apps/web run test:sites"
+  },
+  "devDependencies": {
+    "concurrently": "9.2.1"
+  }
+}
