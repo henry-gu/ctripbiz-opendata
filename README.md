@@ -17,7 +17,13 @@
 
 ## 开发运行
 
-要求 Node.js 24 LTS。凭据沿用根目录 `.env` 中的 `Appkey`、`AppSecurity`、`Corpid`、`Uid`。
+要求 Node.js 24 LTS。首次运行前，请从示例文件创建根目录 `.env`，并填写携程商旅与 OpenAI 兼容模型的凭据：
+
+```bash
+cp .env.example .env
+```
+
+必填的携程商旅配置为 `CTRIPBIZ_APP_KEY`、`CTRIPBIZ_APP_SECURITY`、`CTRIPBIZ_CORP_ID`、`CTRIPBIZ_UID`；智能推荐还需要 `OPENAI_BASE_URL`、`OPENAI_API_KEY`、`OPENAI_MODEL`。可选配置、默认值与格式请参考 [`.env.example`](.env.example)。`.env` 已被 Git 忽略，不会上传到 GitHub。
 
 ```bash
 npm install
@@ -38,6 +44,12 @@ npm start
 ## Windows 与运行依赖
 
 应用不使用 SQLite、数据库服务或数据库驱动，也不会在 `data` 目录保存查询历史。运行时只需要普通用户权限和 Node.js 24：解压免安装版 Node.js 到用户目录后即可运行，不需要管理员权限，也不需要单独安装 SQLite。
+
+在 Windows 中可使用以下命令创建配置文件，然后按 `.env.example` 填入凭据：
+
+```powershell
+Copy-Item .env.example .env
+```
 
 首次安装依赖并构建：
 
