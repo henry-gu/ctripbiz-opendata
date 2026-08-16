@@ -21,6 +21,7 @@
 .chat-page { position: relative; padding-right: 410px; }.chat-debug { position: absolute; top: 112px; right: 38px; width: 340px; margin-top: 0; }.chat-debug pre { max-height: calc(100vh - 240px); }.chat-layout { min-width: 0; }
 .app-main:has(.chat-page) { display: block; overflow: auto; }.chat-results { max-height: min(56vh, 620px); overflow-y: auto; scrollbar-gutter: stable; }.chat-results::-webkit-scrollbar { width: 10px; }.chat-results::-webkit-scrollbar-thumb { border: 3px solid #fff; border-radius: 999px; background: #9fb5cf; }.chat-results::-webkit-scrollbar-track { background: #f2f5f8; }
 .chat-thread { height: calc(100vh - 184px); min-height: 0; overflow-y: auto; scrollbar-gutter: stable; }.chat-input { position: sticky; bottom: 0; padding-bottom: 2px; background: #fff; }.chat-thread::-webkit-scrollbar { width: 10px; }.chat-thread::-webkit-scrollbar-thumb { border: 3px solid #fff; border-radius: 999px; background: #9fb5cf; }.chat-debug { height: calc(50vh - 145px); max-height: none; overflow: auto; }.chat-debug pre { max-height: 230px; }.ctrip-debug { top: calc(50vh + 8px); }.ctrip-debug pre { max-height: 210px; }
+.chat-candidates { margin: 4px 0 16px; border-color: #b9d4f8; background: #f8fbff; }.chat-candidates > span { margin: -2px 0 3px; color: #617080; font-size: 12px; }.chat-candidates button { background: #fff; }.chat-results header div { display: flex; gap: 10px; }
 
 * { box-sizing: border-box; }
 

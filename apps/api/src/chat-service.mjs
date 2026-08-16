@@ -128,8 +128,8 @@ function extractionPrompt() {
 }
 
 function workflowGuidance(state, cityCandidates, candidates) {
-  if (cityCandidates.length) return "我找到了几个可能的目的城市，请在右侧选择最符合的一项。";
-  if (candidates.length) return "我找到了几个可能的位置，请在右侧点选最符合的一项。";
+  if (cityCandidates.length) return "我找到了几个可能的目的城市，请从下方列表选择最符合的一项。";
+  if (candidates.length) return "我找到了几个可能的位置，请从下方列表选择最符合的一项。";
   if (state.locationUnresolved) return "暂时没有找到匹配的位置。请换一个更具体的地标、写字楼、地铁站或道路名称试试。";
   if (state.missing.includes("checkInDate") && state.missing.includes("checkOutDate")) return "地点已确定。您计划哪天入住、哪天退房？也可以直接在右侧确认卡中选择日期。";
   if (state.missing.includes("checkInDate")) return "地点已确定。请告诉我入住日期，或直接在右侧确认卡中选择。";
