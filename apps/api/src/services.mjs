@@ -142,7 +142,11 @@ export const services = {
       sceneFlag: "DATA_PULLING",
       platform: "h5",
     };
-    return cachedCall("hotels", payload, normalizeHotels, TTL_HOTEL, { refresh: body.refresh, timeoutMs: 15000 });
+    return cachedCall("hotels", payload, normalizeHotels, TTL_HOTEL, { refresh: body.refresh, timeoutMs: 15000 }).then((result) => {
+      if (!filters.onlyBayerPreferred) return result;
+      const hotels = result.data.hotels.filter((hotel) => hotel.tags?.bayerPreferred);
+      return { ...result, data: { ...result.data, count: hotels.length, hotels } };
+    });
   },
 
   async chatSearch(body) {
@@ -154,9 +158,14 @@ export const services = {
       guestQuantity: body.guestQuantity || 1,
       page: 1,
       pageSize: 20,
-      filters: { keyword: body.keyword || "" },
+      filters: {
+        keyword: body.keyword || "",
+        stars: body.minStar ? Array.from({ length: 6 - Number(body.minStar) }, (_, index) => Number(body.minStar) + index) : [],
+        lowPrice: body.lowPrice ?? "",
+        highPrice: body.highPrice ?? "",
+      },
     });
-    const hotels = result.data.hotels.filter((hotel) => hotel.available);
+    const hotels = result.data.hotels.filter((hotel) => hotel.available).sort((left, right) => Number(Boolean(right.tags?.bayerPreferred)) - Number(Boolean(left.tags?.bayerPreferred)));
     return { ...result, data: { ...result.data, count: hotels.length, hotels } };
   },
 

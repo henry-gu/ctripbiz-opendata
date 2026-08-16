@@ -36,6 +36,7 @@ function createInitialFilters() {
     stars: [],
     sortType: "DEFAULT",
     onlyAgreement: false,
+    onlyBayerPreferred: false,
     hasBreakfast: false,
     freeCancel: false,
     hasParking: false,
@@ -149,7 +150,7 @@ export function App() {
   const applyChatSearch = useCallback((chatState, chatHotels) => {
     const destinationName = chatState.countyName || chatState.cityName;
     setDestination({ id: chatState.cityId, cityId: chatState.cityId, cityName: chatState.cityName, name: destinationName, type: chatState.countyName ? "COUNTY" : "CITY" });
-    updateFilters({ cityId: chatState.cityId, cityName: chatState.cityName, keyword: chatState.keyword, checkInDate: chatState.checkInDate, checkOutDate: chatState.checkOutDate });
+    updateFilters({ cityId: chatState.cityId, cityName: chatState.cityName, keyword: chatState.keyword, checkInDate: chatState.checkInDate, checkOutDate: chatState.checkOutDate, stars: chatState.minStar ? Array.from({ length: 6 - Number(chatState.minStar) }, (_, index) => Number(chatState.minStar) + index) : [], lowPrice: chatState.lowPrice ?? "", highPrice: chatState.highPrice ?? "" });
     setHotels(chatHotels);
     setHotelCount(chatHotels.length);
     setPage(1);
@@ -184,6 +185,7 @@ export function App() {
           highPrice: filters.highPrice,
           stars: filters.stars,
           onlyAgreement: filters.onlyAgreement,
+          onlyBayerPreferred: filters.onlyBayerPreferred,
           hasBreakfast: filters.hasBreakfast,
           freeCancel: filters.freeCancel,
           hasParking: filters.hasParking,

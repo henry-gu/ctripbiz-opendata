@@ -1,4 +1,4 @@
-import { IconChevronLeft, IconChevronRight, IconDownload, IconRefresh, IconStarFilled, IconTrash } from "@tabler/icons-react";
+import { IconChevronLeft, IconChevronRight, IconDiamondFilled, IconDownload, IconRefresh, IconStarFilled, IconTrash } from "@tabler/icons-react";
 
 function formatPrice(price) {
   return typeof price === "number" ? new Intl.NumberFormat("zh-CN").format(price) : null;
@@ -24,7 +24,7 @@ export function ResultsTable({ hotels, count, page, loading, onPage, onDetail, o
               <tr key={hotel.id}>
                 <td>
                   <div className="hotel-cell">
-                    <div><strong>{hotel.name}</strong><small>ID {hotel.id}</small></div>
+                    <div><strong>{hotel.name}</strong><span className="hotel-tags">{hotel.tags?.bayerPreferred ? <em className="bayer-tag">拜耳优选</em> : null}{hotel.tags?.diamond ? <em className="diamond-tag" title="钻石标签"><IconDiamondFilled size={11} />钻石</em> : null}</span><small>ID {hotel.id}</small></div>
                   </div>
                 </td>
                 <td><span className="address-main">{hotel.address}</span><small>{hotel.zoneName || "区域待确认"}</small></td>
