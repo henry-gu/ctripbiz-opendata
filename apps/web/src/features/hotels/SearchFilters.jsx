@@ -76,7 +76,7 @@ export function SearchFilters({ filters, updateFilters, onSearch, onReset, loadi
         <div className="advanced-panel">
           <div className="check-grid">
             {[
-              ["onlyAgreement", "仅看协议酒店"], ["hasBreakfast", "含早餐"], ["freeCancel", "免费取消"],
+              ["onlyAgreement", "仅看协议酒店"], ["onlyBayerPreferred", "拜耳优选"], ["hasBreakfast", "含早餐"], ["freeCancel", "免费取消"],
               ["hasParking", "停车场"], ["hasFitnessCenter", "健身中心"], ["hasSwimmingPool", "游泳池"],
             ].map(([key, label]) => (
               <label className="check-field" key={key}><input type="checkbox" checked={filters[key]} onChange={(event) => updateFilters({ [key]: event.target.checked })} />{label}</label>

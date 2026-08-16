@@ -39,3 +39,44 @@
 - Automated tests: 10 passed.
 
 final result: passed
+
+---
+
+# Prompt Settings Workspace QA
+
+- Selected source visual truth: `/Users/henrygu/.codex/generated_images/019fffd1-20f8-7631-991b-6d9550c4ee2a/exec-45f67b29-8d5e-468b-950a-020c67c871ac.png`
+- Implementation: `http://127.0.0.1:4173/` → 设置 → 智能推荐设置 (Codex in-app Browser capture)
+- Viewport: 1280 × 720 CSS px; browser device scale 1.
+- State: 条件提取提示词已选中；模型已就绪；保存栏无未保存修改。
+
+## Comparison
+
+The implementation follows the selected prompt-workspace direction: a left in-page prompt menu, one focused wide editor, compact model metadata, and a persistent bottom action bar. The selected mock uses a larger 1440 × 1024 frame, so the implementation naturally uses a shorter editor viewport at 1280 × 720 while retaining page-level and editor-level scrolling.
+
+### Fidelity surfaces
+
+- **Fonts and typography:** Product-system sans-serif hierarchy is retained; editor content intentionally uses a monospace font to improve prompt editing and differs from the mock's rendered line-number treatment.
+- **Spacing and layout rhythm:** 246px in-page navigation, broad editable content area, restrained border radius, and aligned sticky footer closely follow the selected hierarchy.
+- **Colors and tokens:** Existing light gray workspace, white panels, blue selected state, green ready state, and subtle borders match the product's established visual language.
+- **Image quality and assets:** No raster image assets are part of this settings workflow. Existing Tabler UI icons are retained as product controls.
+- **Copy and content:** Labels, local file location, character count, and prompt descriptions reflect the implemented two-prompt model rather than the mock's illustrative three-prompt content.
+
+## Interaction evidence
+
+- Switched from “条件提取提示词” to “对话回复提示词”; the focused editor, title, help copy, and character count updated.
+- Added a character to the focused editor; the save control enabled.
+- Restored the focused prompt default; the save control returned to disabled after matching saved state.
+- Browser console had no application warnings or errors.
+
+## Findings
+
+- No actionable P0, P1, or P2 differences. The source's line-number gutter is an acceptable P3 omission because the editor remains readable, editable, and independently scrollable without synthetically generated line numbers.
+
+## Verification history
+
+- Replaced vertically stacked prompt fields with a focused workspace and in-page prompt menu.
+- Added page-level scrolling, an independently scrollable/resizable editor, wide responsive content layout, and a sticky action bar.
+- Verified the desktop primary interaction loop in the in-app browser.
+- Automated tests: `npm test` passed (12 API tests, web build, and Sites tests).
+
+final result: passed

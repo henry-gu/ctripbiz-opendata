@@ -71,6 +71,11 @@ function hotelPrice(item) {
   ]);
 }
 
+function hotelTags(item, base) {
+  const codes = new Set(firstArray(item, ["hotelTagList", "hotelBaseInfo.hotelTagList"]).concat(firstArray(base, ["hotelTagList"])).map((tag) => String(tag?.tagCode || "").toUpperCase()));
+  return { bayerPreferred: codes.has("GSTJ"), diamond: codes.has("ZSTY") };
+}
+
 export function normalizeHotels(raw) {
   const list = firstArray(raw, ["hotelInfo", "data.hotelInfo", "hotelInfoList", "data.hotelInfoList"]);
   return {
@@ -89,6 +94,7 @@ export function normalizeHotels(raw) {
         price: hotelPrice(item),
         currency: get(item, ["minPriceRoomInfo.minPriceInfo.currency", "minPriceRoomInfo.currency", "currency"], "CNY"),
         available: get(item, ["isEnable", "available", "canBook"], true) !== false,
+        tags: hotelTags(item, base),
         image: get(base, ["hotelImageInfo.imageUrl", "imageUrl", "masterHotelImage", "mainImageUrl"]),
         raw: item,
       };

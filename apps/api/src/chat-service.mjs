@@ -7,6 +7,7 @@ const DATE = /^\d{4}-\d{2}-\d{2}$/;
 const allowedLocationTypes = new Set(["LANDMARK", "ZONE", "METRO_STATION", "HOTEL"]);
 
 function clean(value) { return String(value || "").trim(); }
+function optionalNumber(value, min, max) { const number = Number(value); return Number.isFinite(number) && number >= min && number <= max ? number : null; }
 function validDate(value) { return DATE.test(value) && !Number.isNaN(Date.parse(`${value}T12:00:00`)); }
 function parseJson(text) {
   const match = String(text).match(/\{[\s\S]*\}/);
@@ -26,6 +27,9 @@ export function mergeTripState(previous = {}, extracted = {}) {
     location: clean(extracted.location) || clean(previous.location),
     checkInDate: clean(extracted.checkInDate) || clean(previous.checkInDate),
     checkOutDate: clean(extracted.checkOutDate) || clean(previous.checkOutDate),
+    minStar: optionalNumber(extracted.minStar, 1, 5) || optionalNumber(previous.minStar, 1, 5),
+    lowPrice: optionalNumber(extracted.lowPrice, 0, 100000) ?? optionalNumber(previous.lowPrice, 0, 100000),
+    highPrice: optionalNumber(extracted.highPrice, 0, 100000) ?? optionalNumber(previous.highPrice, 0, 100000),
     cityId: Number(previous.cityId) || null,
     cityName: clean(previous.cityName),
     countyName: clean(previous.countyName),
@@ -120,16 +124,20 @@ async function streamOpenAi(messages, emit, debug) {
   } finally { clearTimeout(timer); }
 }
 
-function extractionPrompt() {
+function currentDateValues() {
   const parts = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Shanghai", year: "numeric", month: "2-digit", day: "2-digit", weekday: "long" }).formatToParts(new Date());
   const value = (type) => parts.find((part) => part.type === type)?.value;
-  const today = `${value("year")}-${value("month")}-${value("day")}`;
-  return `从用户消息中提取国内酒店查询条件，仅输出 JSON：{city:string,location:string,checkInDate:string,checkOutDate:string}。今天是中国时区 ${today}（${value("weekday")}）。未提及字段输出空字符串。必须将“今天、明天、后天、下周一至下周日、本周一至本周日、下个月X日”等自然语言日期换算为实际 YYYY-MM-DD；“下周”是当前自然周之后的一周。若用户说“下周二入住、下周三退房”，分别填写对应的两天，不要继续追问日期。`;
+  return { today: `${value("year")}-${value("month")}-${value("day")}`, weekday: value("weekday") };
+}
+
+export function renderExtractionPrompt(template) {
+  const { today, weekday } = currentDateValues();
+  return String(template).replaceAll("{{today}}", today).replaceAll("{{weekday}}", weekday);
 }
 
 function workflowGuidance(state, cityCandidates, candidates) {
-  if (cityCandidates.length) return "我找到了几个可能的目的城市，请在右侧选择最符合的一项。";
-  if (candidates.length) return "我找到了几个可能的位置，请在右侧点选最符合的一项。";
+  if (cityCandidates.length) return "我找到了几个可能的目的城市，请从下方列表选择最符合的一项。";
+  if (candidates.length) return "我找到了几个可能的位置，请从下方列表选择最符合的一项。";
   if (state.locationUnresolved) return "暂时没有找到匹配的位置。请换一个更具体的地标、写字楼、地铁站或道路名称试试。";
   if (state.missing.includes("checkInDate") && state.missing.includes("checkOutDate")) return "地点已确定。您计划哪天入住、哪天退房？也可以直接在右侧确认卡中选择日期。";
   if (state.missing.includes("checkInDate")) return "地点已确定。请告诉我入住日期，或直接在右侧确认卡中选择。";
@@ -145,7 +153,8 @@ export async function streamChatTurn(body, emit, suggestKeywords) {
   const history = Array.isArray(body?.history) ? body.history.slice(-8).map((item) => ({ role: item.role === "assistant" ? "assistant" : "user", content: clean(item.content).slice(0, 2000) })).filter((item) => item.content) : [];
   const debug = (data) => emit("debug", data);
   try {
-    const extracted = await openAiJson([{ role: "system", content: extractionPrompt() }, ...history, { role: "user", content: message }], debug);
+    const settings = await getChatSettings();
+    const extracted = await openAiJson([{ role: "system", content: renderExtractionPrompt(settings.extractionPrompt) }, ...history, { role: "user", content: message }], debug);
   let state = mergeTripState(body?.state, extracted);
   const cityResult = await resolveCity(state); state = cityResult.state;
   let candidates = [];
@@ -172,7 +181,6 @@ export async function streamChatTurn(body, emit, suggestKeywords) {
     emit("done", { state, cityCandidates: cityResult.cityCandidates, candidates });
     return;
   }
-  const settings = await getChatSettings();
   const context = JSON.stringify({ state, cityCandidates: cityResult.cityCandidates.map((item) => ({ name: item.resultName, parentCityName: item.parentCityName })), candidateCount: candidates.length });
     await streamOpenAi([{ role: "system", content: settings.systemPrompt }, { role: "system", content: `已验证的当前状态：${context}` }, ...history, { role: "user", content: message }], emit, debug);
     emit("done", { state, cityCandidates: cityResult.cityCandidates, candidates });

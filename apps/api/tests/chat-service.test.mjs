@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { mergeTripState } from "../src/chat-service.mjs";
+import { mergeTripState, renderExtractionPrompt } from "../src/chat-service.mjs";
 
 test("chat state keeps missing dates and never applies defaults", () => {
   const state = mergeTripState({}, { city: "重庆", location: "解放碑", checkInDate: "", checkOutDate: "" });
@@ -23,4 +23,17 @@ test("validated county state preserves parent city and county keyword", () => {
   assert.equal(state.countyName, "酉阳");
   assert.equal(state.keyword, "酉阳");
   assert.deepEqual(state.missing, []);
+});
+
+test("extraction prompt substitutes local date placeholders", () => {
+  const prompt = renderExtractionPrompt("日期 {{today}}，星期 {{weekday}}");
+  assert.doesNotMatch(prompt, /\{\{today\}\}|\{\{weekday\}\}/);
+  assert.match(prompt, /日期 \d{4}-\d{2}-\d{2}，星期/);
+});
+
+test("chat state retains hotel star and price constraints", () => {
+  const state = mergeTripState({}, { city: "上海", location: "前滩广场", checkInDate: "2026-08-18", checkOutDate: "2026-08-21", minStar: "3", lowPrice: "500", highPrice: "1000" });
+  assert.equal(state.minStar, 3);
+  assert.equal(state.lowPrice, 500);
+  assert.equal(state.highPrice, 1000);
 });

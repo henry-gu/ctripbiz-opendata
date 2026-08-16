@@ -6,7 +6,7 @@ import { diagnostics, ticketStatus } from "./ctrip-client.mjs";
 import { publicError } from "./errors.mjs";
 import { services } from "./services.mjs";
 import { streamChatTurn } from "./chat-service.mjs";
-import { DEFAULT_CHAT_PROMPT, getChatSettings, saveChatSettings } from "./chat-settings.mjs";
+import { DEFAULT_CHAT_PROMPT, DEFAULT_EXTRACTION_PROMPT, getChatSettings, saveChatSettings } from "./chat-settings.mjs";
 
 const app = Fastify({ logger: { level: process.env.LOG_LEVEL || "info", redact: ["req.headers.authorization"] } });
 
@@ -53,7 +53,7 @@ app.get("/api/v1/geo/provinces/:provinceId", async (request, reply) => {
 });
 app.get("/api/v1/geo/raw", async (request) => ({ requestId: request.id, data: await services.geoRaw() }));
 app.post("/api/v1/geo/refresh", async (request) => ({ requestId: request.id, data: await services.geoRefresh() }));
-app.get("/api/v1/chat/settings", async (request) => ({ requestId: request.id, data: { ...(await getChatSettings()), defaultSystemPrompt: DEFAULT_CHAT_PROMPT, llm: getLlmStatus() } }));
+app.get("/api/v1/chat/settings", async (request) => ({ requestId: request.id, data: { ...(await getChatSettings()), defaultSystemPrompt: DEFAULT_CHAT_PROMPT, defaultExtractionPrompt: DEFAULT_EXTRACTION_PROMPT, llm: getLlmStatus() } }));
 app.put("/api/v1/chat/settings", async (request) => ({ requestId: request.id, data: await saveChatSettings(request.body ?? {}) }));
 app.post("/api/v1/chat/search", async (request) => {
   const result = await services.chatSearch(request.body ?? {});

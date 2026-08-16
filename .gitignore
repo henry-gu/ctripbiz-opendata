@@ -7,5 +7,4 @@ dist/
 apps/*/dist/
 apps/*/node_modules/
 data/cache/
-data/*.json
 *.log

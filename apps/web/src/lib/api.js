@@ -38,7 +38,7 @@ export const api = {
   geoRaw: () => request("/api/v1/geo/raw"),
   refreshGeo: () => post("/api/v1/geo/refresh", {}),
   chatSettings: () => request("/api/v1/chat/settings"),
-  saveChatSettings: (systemPrompt) => request("/api/v1/chat/settings", { method: "PUT", body: JSON.stringify({ systemPrompt }) }),
+  saveChatSettings: (settings) => request("/api/v1/chat/settings", { method: "PUT", body: JSON.stringify(settings) }),
   chatSearch: (payload) => post("/api/v1/chat/search", payload),
   debug: (requestId) => request(`/api/v1/debug/requests/${encodeURIComponent(requestId)}`),
 };
